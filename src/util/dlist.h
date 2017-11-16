@@ -77,7 +77,7 @@ public:
    iterator begin() const { return iterator(_head); }
    iterator end() const { return iterator(_head->_prev); }
    bool empty() const { return (_head == _head->_prev); }
-   size_t size() const {  
+   size_t size() const {
      size_t count = 0;
      for (iterator li = begin(); li != end(); li++) {
        count++;
@@ -86,12 +86,19 @@ public:
    }
 
    void push_back(const T& x) {
-     DListNode<T>* newNode = new DListNode<T>(x, _head->_prev, _head);
-     (_head->_prev)->_next = newNode;
-     _head->_prev = newNode;
-     _isSorted = false;
+     if (_head == _head->_prev) {
+       DListNode<T>* newNode = new DListNode<T>(x, _head->_prev, _head);
+       _head = newNode;
+       _head->_prev->_next = _head;
+       _head->_prev->_prev = _head;
+     } else {
+       DListNode<T>* newNode = new DListNode<T>(x, _head->_prev->_prev, _head->_prev);
+       _head->_prev->_prev->_next = newNode;
+       _head->_prev->_prev = newNode;
+       _isSorted = false;
+     }
    }
-   
+
    void pop_front() {
      if (empty()) { return; }
      DListNode<T>* deleteNode = _head;
@@ -103,9 +110,9 @@ public:
 
    void pop_back() {
      if (empty()) { return; }
-     DListNode<T>* deleteNode = _head->_prev;
-     ((_head->_prev)->_prev)->_next = _head;
-     _head->_prev = (_head->_prev)->_prev;
+     DListNode<T>* deleteNode = _head->_prev->_prev;
+     _head->_prev->_prev->_prev->_next = _head->_prev;
+     _head->_prev->_prev = _head->_prev->_prev->_prev;
      delete deleteNode;
    }
 
@@ -120,11 +127,11 @@ public:
        pos._node->_prev->_next = pos._node->_next;
        pos._node->_next->_prev = pos._node->_prev;
        delete deleteNode;
-       return true; 
+       return true;
      }
    }
-   
-   bool erase(const T& x) { 
+
+   bool erase(const T& x) {
      if (empty()) { return false; }
      for(iterator i = begin(); i != end(); i++) {
        if (*i == x) {
@@ -132,24 +139,24 @@ public:
          return true;
        }
      }
-     return false; 
+     return false;
    }
 
    void clear() {
      if (empty()) { return; }
      while(_head != _head->_prev) {
-       pop_back();
+       pop_front();
      }
    }  // delete all nodes except for the dummy node
 
    void sort() const {
      if (_isSorted || empty()) { return; }
-     
+
      iterator a = begin();
      T temp;
-     
-     for (size_t i = 0; i < size() - 1; i++) {
-       for (size_t j = 0; j < size() - 1 - i; j++) {
+     int length = size();
+     for (size_t i = 0; i < length - 1; i++) {
+       for (size_t j = 0; j < length - 1 - i; j++) {
          if (a._node->_data > a._node->_next->_data) {
            temp = a._node->_data;
            a._node->_data = a._node->_next->_data;
@@ -167,7 +174,7 @@ private:
    DListNode<T>*  _head;     // = dummy node if list is empty
    mutable bool   _isSorted; // (optionally) to indicate the array is sorted
 
-   // [OPTIONAL TODO] helper functions; called by public member functions   
+   // [OPTIONAL TODO] helper functions; called by public member functions
 };
 
 #endif // DLIST_H
