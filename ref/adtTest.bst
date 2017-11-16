@@ -1,1 +1,1 @@
-adtTest-linux.bst
+adtTest-mac.bst
