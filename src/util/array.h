@@ -35,45 +35,112 @@ public:
       ~iterator() {} // Should NOT delete _node
 
       // TODO: implement these overloaded operators
-      const T& operator * () const { return (*this); }
+      const T& operator * () const { return (*_node); }
       T& operator * () { return (*_node); }
-      iterator& operator ++ () { return (*this); }
-      iterator operator ++ (int) { return (*this); }
-      iterator& operator -- () { return (*this); }
-      iterator operator -- (int) { return (*this); }
+      iterator& operator ++ () { _node++; return (*this); }
+      iterator operator ++ (int) { iterator temp = *this; _node++; return temp; }
+      iterator& operator -- () { _node--; return (*this); }
+      iterator operator -- (int) { iterator temp = *this; _node--; return temp; }
 
-      iterator operator + (int i) const { return (*this); }
-      iterator& operator += (int i) { return (*this); }
+      iterator operator + (int i) const { return iterator(_node + i); }
+      iterator& operator += (int i) { _node += i; return (*this); }
 
-      iterator& operator = (const iterator& i) { return (*this); }
+      iterator& operator = (const iterator& i) { _node = i._node; return (*this); }
 
-      bool operator != (const iterator& i) const { return false; }
-      bool operator == (const iterator& i) const { return false; }
+      bool operator != (const iterator& i) const { return _node != i._node; }
+      bool operator == (const iterator& i) const { return _node == i._node; }
 
    private:
       T*    _node;
    };
 
    // TODO: implement these functions
-   iterator begin() const { return 0; }
-   iterator end() const { return 0; }
-   bool empty() const { return false; }
-   size_t size() const { return 0; }
+   iterator begin() const { return iterator(_data); }
+   iterator end() const { return iterator(_data + _size); }
+   bool empty() const { return (_size == 0); }
+   size_t size() const { return _size; }
 
-   T& operator [] (size_t i) { return _data[0]; }
-   const T& operator [] (size_t i) const { return _data[0]; }
+   T& operator [] (size_t i) { return _data[i]; }
+   const T& operator [] (size_t i) const { return _data[i]; }
 
-   void push_back(const T& x) { }
-   void pop_front() { }
-   void pop_back() { }
+   void push_back(const T& x) {
+     if (_capacity == 0) {
+       _capacity = 1;
+       _data = new T[_capacity];
+       _data[_size] = x;
+       _size++;
+     } else {
+       if (_size < _capacity) {
+         _data[_size] = x;
+         _size++;
+       } else {
+         _capacity *= 2;
+         T* temp = _data;
+         _data = new T[_capacity];
+         for (size_t i = 0; i < _size; i++) {
+           _data[i] = temp[i];
+         }
+         _data[_size] = x;
+         _size++;
+       }
+     }
+     _isSorted = false;
+   }
 
-   bool erase(iterator pos) { return false; }
-   bool erase(const T& x) { return false; }
+   void pop_front() {
+     if (empty()) {
+       return;
+     } else if (_size == 1) {
+       _size--;
+     } else {
+       *begin() = *(--end());
+       _size--;
+     }
+   }
 
-   void clear() { }
+   void pop_back() {
+     if (empty()) {
+       return;
+     } else {
+       _size--;
+     }
+   }
+
+   bool erase(iterator pos) {
+     if (empty()) {
+       return false;
+     } else if (pos._node < _data || pos._node >= (_data+_size)) {
+       return false;
+     }
+
+     *pos = *(--end());
+     _size--;
+     return true;
+   }
+
+   bool erase(const T& x) {
+     if (empty()) {
+       return false;
+     }
+     for (size_t i = 0; i < _size; i++) {
+       if (_data[i] == x) {
+         if (i == 0) {
+           pop_front();
+         } else {
+           iterator pos = (begin() += i);
+           *pos = *(--end());
+           _size--;
+         }
+         return true;
+       }
+     }
+     return false;
+   }
+
+   void clear() { _size = 0; }
 
    // [Optional TODO] Feel free to change, but DO NOT change ::sort()
-   void sort() const { if (!empty()) ::sort(_data, _data+_size); }
+   void sort() const { if (!empty()) ::sort(_data, _data+_size); _isSorted = true;}
 
    // Nice to have, but not required in this homework...
    // void reserve(size_t n) { ... }
