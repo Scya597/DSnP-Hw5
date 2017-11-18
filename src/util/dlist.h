@@ -10,7 +10,6 @@
 #define DLIST_H
 
 #include <cassert>
-#include <iostream>
 template <class T> class DList;
 
 // DListNode is supposed to be a private class. User don't need to see it.
@@ -147,7 +146,6 @@ public:
      while(_head != _head->_prev) {
        pop_front();
      }
-     std::cout << size() << std::endl;
    }  // delete all nodes except for the dummy node
 
    void sort() const {
