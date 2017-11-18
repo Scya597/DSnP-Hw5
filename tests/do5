@@ -1,16 +1,28 @@
-adta -r 50
+adta -r 400000
 usage
-adtp
+adtd -All
 usage
-adtp -r
+adta -r 800000
 usage
-adts
+adtd -All
 usage
-adtp
+adta -r 1200000
 usage
-adtp -r
+adtd -All
 usage
-adtr 3
-adta -r 50
+adta -r 1600000
 usage
-adtp
+adtd -All
+usage
+adta -r 2000000
+usage
+adtd -All
+usage
+adta -r 2400000
+usage
+adtd -All
+usage
+adta -r 2800000
+usage
+adtd -All
+usage
